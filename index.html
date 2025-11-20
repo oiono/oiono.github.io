@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Product Expert - Resume</title>
+    <style>
+        /* Basic Reset & Font */
+        body {
+            font-family: 'Arial', 'Helvetica Neue', Helvetica, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+
+        /* Container for the whole resume */
+        .resume-container {
+            max-width: 900px;
+            /* 整体上移调整：将顶部 margin 从 30px 减少到 10px 左右，以达到内容上移的效果 */
+            margin: 10px auto; 
+            background-color: #fff;
+            box-shadow: 0 0px 10px rgba(0, 0, 0, 0.05); /* 稍微调整阴影 */
+            padding: 40px;
+            border-radius: 8px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        /* Header Section */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding-bottom: 0px; /* 减少 Header 底部内边距 */
+            margin-bottom: 5px; /* 进一步减少 Header 底部外边距，以达到内容上移的效果 */
+            position: relative;
+            min-height: 160px; /* 调整预留空间 */
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin: 0;
+            color: #2c3e50;
+            font-weight: 700;
+        }
+
+        .header .title {
+            font-size: 1.2em;
+            color: #555;
+            margin-top: 5px;
+            font-weight: 500;
+            /* 增加 title 下方与联系方式的间距 */
+            margin-bottom: 8px; 
+        }
+
+        /* --- 联系信息的新样式和位置 --- */
+        .header .contact-info-below {
+            /* 确保它在 title 下方 */
+            font-size: 1em; /* 区分：略大于右上角 0.9em 的字体 */
+            color: #777; /* 区分：颜色比标题淡 */
+            text-align: left;
+            line-height: 1.5;
+            margin-top: 0px; /* 紧贴 title */
+            margin-bottom: 10px; /* 与下方 "个人简介" 的间距 */
+        }
+        .header .contact-info-below a {
+            color: #007bff;
+            text-decoration: none;
+            margin-left: 10px;
+        }
+        .header .contact-info-below a:hover {
+            text-decoration: underline;
+        }
+        /* 隐藏原右上角联系信息，只保留电话和照片的定位 */
+        .header .contact-info-top {
+            display: none; /* 隐藏原右上角联系信息 */
+        }
+        /* ---------------------------------- */
+
+
+        /* Contact Info and Photo Wrapper (Right Section) */
+        .header .right-section {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            position: absolute;
+            right: 0;
+            top: 0;
+            padding-left: 20px;
+        }
+
+        /* Profile Photo Styling */
+        .profile-photo {
+            width: 140px;
+            height: auto;
+            object-fit: cover;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-top: 10px; /* 使照片在最右侧顶部留出一些空间 */
+        }
+
+        /* Section Headings */
+        h2 {
+            font-size: 1.6em;
+            color: #2c3e50;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 8px;
+            /* 整体上移调整：进一步减少顶部外边距 */
+            margin-top: 15px; 
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        /* General List Styling for Experience/Projects */
+        ul {
+            list-style-type: disc;
+            padding-left: 20px;
+            margin-bottom: 15px; /* 减少底部外边距，以达到内容上移的效果 */
+        }
+
+        ul li {
+            margin-bottom: 6px; /* 减少列表项间距 */
+            line-height: 1.6;
+        }
+
+        /* ... 其他样式保持不变 ... */
+
+        .experience-item, .project-item {
+            margin-bottom: 20px; /* 减少工作经历项之间的间距 */
+        }
+        
+        /* 保持其他样式不变 */
+        .experience-item h3, .project-item h3 {
+            font-size: 1.2em;
+            color: #34495e;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            font-weight: 600;
+        }
+
+        .experience-item .role, .project-item .role {
+            font-weight: normal;
+            font-style: italic;
+            color: #777;
+            font-size: 1em;
+        }
+
+        .experience-item .date, .project-item .date {
+            font-size: 0.9em;
+            color: #777;
+            font-weight: normal;
+        }
+
+        .experience-item .description, .project-item .description {
+            font-size: 1em;
+            margin-top: 5px;
+        }
+
+        /* Skills Section */
+        .skills-list {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .skills-list li {
+            background-color: #f0f4f7;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: #34495e;
+            font-weight: 500;
+        }
+        .skills-list strong {
+            color: #2c3e50;
+            margin-right: 5px;
+        }
+
+        /* Education Section */
+        .education-item {
+            margin-bottom: 15px;
+        }
+        .education-item h3 {
+            font-size: 1.2em;
+            color: #34495e;
+            margin-bottom: 3px;
+            font-weight: 600;
+        }
+        .education-item .details {
+            font-size: 1em;
+            color: #666;
+        }
+
+        /* Responsive adjustments for smaller screens */
+        @media (max-width: 768px) {
+            .resume-container {
+                margin: 20px;
+                padding: 20px;
+            }
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                padding-bottom: 15px;
+                margin-bottom: 15px;
+                min-height: auto;
+            }
+            .header .right-section {
+                position: static;
+                width: 100%;
+                align-items: flex-start;
+                margin-top: 15px;
+                padding-left: 0;
+            }
+            .header .contact-info-top {
+                display: block; /* 移动端显示原右上角信息 */
+                text-align: left;
+                margin-bottom: 10px;
+            }
+            .header .contact-info-below {
+                display: none; /* 移动端隐藏新加的信息 */
+            }
+            .profile-photo {
+                width: 100px;
+                height: auto;
+                margin-top: 10px;
+            }
+            h1 {
+                font-size: 2em;
+            }
+            h2 {
+                font-size: 1.4em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="resume-container">
+        <div class="header">
+            <div>
+                <h1>冯希亮</h1>
+                <div class="title">AI Product Expert / Solutions Architect</div>
+                <div class="contact-info-below">
+                    电话: 13760815114 | 邮箱: oiono@qq.com <a href="https://oiono.github.io" target="_blank">GitHub</a>
+                </div>
+            </div>
+            <div class="right-section">
+                <div class="contact-info-top">
+                    </div>
+                <img src="最终版 朝向正确.jpg" alt="Professional Headshot" class="profile-photo">
+            </div>
+        </div>
+
+        <section class="section">
+            <h2>个人简介 (Executive Summary)</h2>
+            <ul>
+                <li><strong>资深 AI 产品落地专家：</strong> 拥有 10 年+ 教育科技行业经验，精通 LLM（大语言模型） 在垂直场景的商业化落地。擅长利用 GenAI (AIGC) 技术重构业务流（Workflow），具备从需求分析、Prompt 工程调优到 RAG（检索增强生成） 知识库搭建的端到端交付能力。</li>
+                <li><strong>全栈解决方案架构能力：</strong> 熟练掌握 昇腾 (Ascend) / GPT / Claude 等主流模型生态。具备极强的业务抽象能力，能独立主导 SaaS 产品 从 0 到 1 的架构设计与迭代，成功帮助企业实现降本增效与数字化转型。</li>
+                <li><strong>跨文化商务与市场洞察：</strong> 雅思 8.0，具备极强的双语商务谈判与演示能力（Pre-sales）。擅长基于 Python 进行市场情报分析与用户画像挖掘，精准捕捉 ToB/ToC 市场机会。</li>
+            </ul>
+        </section>
+
+        <section class="section">
+            <h2>工作经历 (Professional Experience)</h2>
+
+            <div class="experience-item">
+                <h3><span>AI 教育数字化转型与 AIGC 应用落地</span> <span class="date">2023 – 至今</span></h3>
+                <div class="role">项目负责人 / Product Owner</div>
+                <ul>
+                    <li><strong>AI 解决方案架构与 ToB 交付：</strong> 主导教育行业客户的 AI 数字化转型咨询。基于昇腾及开源大模型生态，重构教研工作流（Workflow），设计从“需求清洗”到“内容生成”的 SaaS 化解决方案，成功帮助客户降低 60% 的内容生产边际成本（Marginal Cost）。</li>
+                    <li><strong>垂直领域 Agent 产品化：</strong> 0-1 搭建基于 RAG（检索增强生成） 技术的语言学习智能体。通过多级 Prompt Engineering 优化模型推理逻辑，解决了通用大模型在垂类教育场景下的“幻觉”问题，实现了毫秒级的个性化语音反馈与评测。</li>
+                    <li><strong>商业化闭环验证：</strong> 设计并跑通 MVP（最小可行性产品）模型，将 AI 介入后的用户复购率提升 30%。负责技术选型与供应商管理，打通了从“流量获客”到“AI 服务交付”的完整商业闭环。</li>
+                </ul>
+            </div>
+
+            <div class="experience-item">
+                <h3><span>沉浸式语言学习产品孵化</span> <span class="date">2022 – 2023</span></h3>
+                <div class="role">EdTech Product Growth Lead</div>
+                <ul>
+                    <li><strong>游戏化产品设计 (Gamification Strategy)：</strong> 主导“语言学习+游戏化”核心模块的产品化转型。设计用户激励体系与交互机制，将传统线下教学场景转化为标准化的<strong>高互动产品模型</strong>，显著提升了用户活跃度（DAU）。</li>
+                    <li><strong>用户生命周期管理 (User Retention & LTV)：</strong> 搭建数据驱动的学习追踪系统（LMS），通过全链路数据埋点分析用户行为。基于数据洞察优化服务SOP，成功将核心用户<strong>复购率（Retention Rate）提升 30%</strong>，大幅延长用户生命周期价值（LTV）。</li>
+                    <li><strong>敏捷迭代与交付：</strong> 带领团队进行产品的快速原型开发与 A/B 测试，验证市场需求，确保产品功能与用户痛点的高度匹配。</li>
+                </ul>
+            </div>
+
+            <div class="experience-item">
+                <h3><span>早期职业经历 / Early Career</span> <span class="date">2012 – 2022</span></h3>
+                <div class="role">在教育科技与跨文化交流领域积累了十年专业经验。</div>
+            </div>
+
+        </section>
+
+        <section class="section">
+            <h2>技能与工具 (Skills & Tech Stack)</h2>
+            <ul class="skills-list">
+                <li><strong>GenAI & LLM Stack:</strong> Prompt Engineering (Advanced), RAG Architecture, GPT-4, Claude, Midjourney, LangChain 概念。</li>
+                <li><strong>Development & Data:</strong> Python (Pandas, NumPy, Requests), 华为昇腾 (Ascend) 生态, SQL (基础)。</li>
+                <li><strong>Product & Design:</strong> Figma (原型设计), XMind (逻辑架构), Notion (知识库管理), Canva (视觉呈现)。</li>
+                <li><strong>Languages:</strong> English (IELTS 8.0, Native-level Fluency), Mandarin, Cantonese.</li>
+            </ul>
+        </section>
+
+        <section class="section">
+            <h2>教育背景 (Education)</h2>
+            <div class="education-item">
+                <h3>University of Hong Kong</h3>
+                <div class="details">Technology, Design & Leadership for Learning (MEd level coursework), Hong Kong SAR</div>
+            </div>
+            <div class="education-item">
+                <h3>South China Agricultural University</h3>
+                <div class="details">Landscape Design (Bachelor, Recommended for Admission), Guangzhou, China</div>
+            </div>
+        </section>
+
+    </div>
+</body>
+</html>
