@@ -1,0 +1,431 @@
+&lt;!DOCTYPE html&gt;
+&lt;html lang="zh-HK"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;粵語詞彙連線 (給熙妍的專屬遊戲)&lt;/title&gt;
+    &lt;style&gt;
+        :root {
+            --primary-color: #673ab7; /* 深紫色 */
+            --secondary-color: #009688; /* 青色 */
+            --bg-color: #fdfbf7;
+            --text-color: #333;
+            --line-correct: #4caf50;
+            --line-wrong: #f44336;
+            --line-active: #2196f3;
+        }
+
+        body {
+            font-family: "KaiTi", "楷体", "Microsoft JhengHei", sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            user-select: none;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin: 20px 0 5px 0;
+            font-size: 1.8rem;
+            text-align: center;
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            color: #666;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .status-bar {
+            font-size: 0.8rem;
+            color: #888;
+            margin-bottom: 10px;
+            padding: 5px 10px;
+            background: #eee;
+            border-radius: 10px;
+        }
+
+        .controls {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        button:active { transform: scale(0.95); }
+
+        button.active-mode {
+            background-color: var(--secondary-color);
+            font-weight: bold;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+        }
+
+        .game-area {
+            position: relative;
+            width: 90%;
+            max-width: 800px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            min-height: 450px; /* 增加高度 */
+        }
+
+        .column {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around; /* 均匀分布 */
+            gap: 10px;
+            width: 42%;
+            z-index: 2;
+        }
+
+        .item {
+            background-color: #fff;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 10px 5px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 50px;
+        }
+
+        .item:hover {
+            background-color: #ede7f6;
+            border-color: var(--primary-color);
+        }
+        
+        .item.selected {
+            background-color: #d1c4e9;
+            border-color: var(--primary-color);
+            transform: scale(1.02);
+        }
+
+        .item.matched {
+            background-color: #e8f5e9;
+            border-color: var(--line-correct);
+            color: var(--line-correct);
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .item.error {
+            animation: shake 0.4s;
+            border-color: var(--line-wrong);
+            background-color: #ffebee;
+        }
+
+        .speaker-icon {
+            font-size: 1rem;
+            margin-bottom: 2px;
+            color: var(--primary-color);
+        }
+
+        .hanzi {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .jyutping {
+            font-size: 1.1rem;
+            color: #555;
+            font-family: "Arial", sans-serif;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+
+        #svg-canvas {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        line {
+            stroke-width: 4;
+            stroke-linecap: round;
+            transition: stroke 0.3s;
+            opacity: 0.8;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            animation: popUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popUp {
+            from { transform: scale(0.5); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+    &lt;h1&gt;🗣️ 粵語發音連線&lt;/h1&gt;
+    &lt;div class="subtitle"&gt;點擊左側聽發音，連接右側對應的粵拼 (Jyutping)&lt;/div&gt;
+    
+    &lt;div id="voice-status" class="status-bar"&gt;正在加載語音...&lt;/div&gt;
+
+    &lt;div class="controls"&gt;
+        &lt;button onclick="initGame(1)" id="btn-lvl1" class="active-mode"&gt;第1關：雙字詞&lt;/button&gt;
+        &lt;button onclick="initGame(2)" id="btn-lvl2"&gt;第2關：四字詞與成語&lt;/button&gt;
+        &lt;button onclick="resetGame()" style="background-color: #ff7043;"&gt;🔄 重置&lt;/button&gt;
+    &lt;/div&gt;
+
+    &lt;div class="game-area"&gt;
+        &lt;svg id="svg-canvas"&gt;&lt;/svg&gt;
+        &lt;div class="column" id="col-left"&gt;&lt;/div&gt;
+        &lt;div class="column" id="col-right"&gt;&lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;div class="modal" id="victory-modal"&gt;
+        &lt;div class="modal-content"&gt;
+            &lt;div style="font-size: 4rem;"&gt;💯&lt;/div&gt;
+            &lt;h2&gt;熙妍好棒！&lt;/h2&gt;
+            &lt;p&gt;全部答啱晒！&lt;/p&gt;
+            &lt;button onclick="closeModal()"&gt;再玩一次&lt;/button&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;script&gt;
+        const gameData = {
+            1: [
+                { id: 1, text: "誇口", left: "誇口", right: "kwaa1 hau2" },
+                { id: 2, text: "戰績", left: "戰績", right: "zin3 zik1" },
+                { id: 3, text: "指點", left: "指點", right: "zi2 dim2" },
+                { id: 4, text: "技術", left: "技術", right: "gei6 seot6" },
+                { id: 5, text: "竅門", left: "竅門", right: "hiu3 mun4" },
+                { id: 6, text: "抖動", left: "抖動", right: "dau2 dung6" },
+                { id: 7, text: "灰溜溜", left: "灰溜溜", right: "fui1 lau1 lau1" },
+                { id: 8, text: "保姆", left: "保姆", right: "bou2 mou5" }
+            ],
+            2: [
+                { id: 1, text: "羨慕", left: "羨慕", right: "sin6 mou6" },
+                { id: 2, text: "熟練", left: "熟練", right: "suk6 lin6" },
+                { id: 3, text: "滔滔不絕", left: "滔滔不絕", right: "tou1 tou1 bat1 zyut6" },
+                { id: 4, text: "收穫", left: "收穫", right: "sau1 wok6" },
+                { id: 5, text: "運氣", left: "運氣", right: "wan6 hei3" },
+                { id: 6, text: "風和日麗", left: "風和日麗", right: "fung1 wo4 jat6 lai6" },
+                { id: 7, text: "急匆匆", left: "急匆匆", right: "gap1 cung1 cung1" },
+                { id: 8, text: "周到", left: "周到", right: "zau1 dou3" }
+            ]
+        };
+
+        let currentLevel = 1;
+        let currentData = [];
+        let selectedLeft = null;
+        let connections = [];
+        const colors = ['#E91E63', '#9C27B0', '#673AB7', '#3F51B5', '#2196F3', '#009688', '#FF9800', '#795548'];
+        
+        // 语音相关
+        let voices = [];
+        const statusDiv = document.getElementById('voice-status');
+
+        function loadVoices() {
+            voices = window.speechSynthesis.getVoices();
+            // 尝试找到粤语发音
+            const cantoneseVoice = voices.find(v =&gt; v.lang === 'zh-HK' || v.name.includes('Hong Kong') || v.name.includes('Cantonese'));
+            
+            if (cantoneseVoice) {
+                statusDiv.innerText = "✅ 語音就緒: " + cantoneseVoice.name;
+                statusDiv.style.color = "green";
+            } else if (voices.length &gt; 0) {
+                statusDiv.innerText = "⚠️ 未檢測到粵語語音包，可能會讀成普通話 (請在電腦設置中添加 '中文(香港)')";
+                statusDiv.style.color = "red";
+            }
+        }
+
+        window.speechSynthesis.onvoiceschanged = loadVoices;
+        setTimeout(loadVoices, 500); // 兜底加载
+
+        function speakCantonese(text) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.rate = 0.8; 
+
+            // 强力搜索粤语语音
+            // 1. 优先找 zh-HK
+            // 2. 其次找名字里带 Hong Kong 的
+            // 3. 再次找名字里带 Cantonese 的
+            let voice = voices.find(v =&gt; v.lang === 'zh-HK');
+            if (!voice) voice = voices.find(v =&gt; v.name.includes('Hong Kong'));
+            if (!voice) voice = voices.find(v =&gt; v.name.includes('Cantonese'));
+
+            if (voice) {
+                utterance.voice = voice;
+                utterance.lang = 'zh-HK';
+            } else {
+                // 如果真的找不到，只能尝试强行设置 lang，看浏览器是否会自动下载
+                utterance.lang = 'zh-HK';
+            }
+            
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function initGame(level) {
+            currentLevel = level;
+            currentData = JSON.parse(JSON.stringify(gameData[level]));
+            connections = [];
+            selectedLeft = null;
+            
+            document.getElementById('btn-lvl1').className = level === 1 ? 'active-mode' : '';
+            document.getElementById('btn-lvl2').className = level === 2 ? 'active-mode' : '';
+            document.getElementById('svg-canvas').innerHTML = '';
+
+            const leftCol = document.getElementById('col-left');
+            const rightCol = document.getElementById('col-right');
+            leftCol.innerHTML = '';
+            rightCol.innerHTML = '';
+
+            const rightData = [...currentData].sort(() =&gt; Math.random() - 0.5);
+
+            currentData.forEach(item =&gt; {
+                const el = document.createElement('div');
+                el.className = 'item';
+                el.dataset.id = item.id;
+                el.dataset.text = item.text;
+                el.innerHTML = `&lt;span class="speaker-icon"&gt;🔊&lt;/span&gt;&lt;span class="hanzi"&gt;${item.left}&lt;/span&gt;`;
+                el.onclick = () =&gt; handleLeftClick(el);
+                leftCol.appendChild(el);
+            });
+
+            rightData.forEach(item =&gt; {
+                const el = document.createElement('div');
+                el.className = 'item';
+                el.dataset.id = item.id;
+                el.innerHTML = `&lt;span class="jyutping"&gt;${item.right}&lt;/span&gt;`;
+                el.onclick = () =&gt; handleRightClick(el);
+                rightCol.appendChild(el);
+            });
+        }
+
+        function handleLeftClick(el) {
+            if (el.classList.contains('matched')) return;
+            speakCantonese(el.dataset.text);
+            document.querySelectorAll('#col-left .item').forEach(i =&gt; i.classList.remove('selected'));
+            selectedLeft = el;
+            el.classList.add('selected');
+        }
+
+        function handleRightClick(el) {
+            if (el.classList.contains('matched')) return;
+            if (!selectedLeft) return;
+
+            const leftId = parseInt(selectedLeft.dataset.id);
+            const rightId = parseInt(el.dataset.id);
+
+            if (leftId === rightId) {
+                successMatch(selectedLeft, el);
+            } else {
+                errorMatch(selectedLeft, el);
+            }
+            
+            selectedLeft.classList.remove('selected');
+            selectedLeft = null;
+        }
+
+        function successMatch(leftEl, rightEl) {
+            leftEl.classList.add('matched');
+            rightEl.classList.add('matched');
+            const color = colors[connections.length % colors.length];
+            drawLine(leftEl, rightEl, color);
+            connections.push({left: leftEl, right: rightEl});
+
+            if (connections.length === currentData.length) {
+                setTimeout(() =&gt; {
+                    document.getElementById('victory-modal').style.display = 'flex';
+                }, 600);
+            }
+        }
+
+        function errorMatch(leftEl, rightEl) {
+            leftEl.classList.add('error');
+            rightEl.classList.add('error');
+            setTimeout(() =&gt; {
+                leftEl.classList.remove('error');
+                rightEl.classList.remove('error');
+            }, 500);
+        }
+
+        function drawLine(el1, el2, color) {
+            const svg = document.getElementById('svg-canvas');
+            const rect1 = el1.getBoundingClientRect();
+            const rect2 = el2.getBoundingClientRect();
+            const container = document.querySelector('.game-area').getBoundingClientRect();
+            const x1 = rect1.left + rect1.width / 2 - container.left;
+            const y1 = rect1.top + rect1.height / 2 - container.top;
+            const x2 = rect2.left + rect2.width / 2 - container.left;
+            const y2 = rect2.top + rect2.height / 2 - container.top;
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', x1);
+            line.setAttribute('y1', y1);
+            line.setAttribute('x2', x2);
+            line.setAttribute('y2', y2);
+            line.setAttribute('stroke', color);
+            svg.appendChild(line);
+        }
+
+        function resetGame() { initGame(currentLevel); }
+        function closeModal() {
+            document.getElementById('victory-modal').style.display = 'none';
+            resetGame();
+        }
+
+        window.addEventListener('resize', () =&gt; {
+            document.getElementById('svg-canvas').innerHTML = '';
+            connections.forEach((c, i) =&gt; drawLine(c.left, c.right, colors[i % colors.length]));
+        });
+
+        initGame(1);
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
